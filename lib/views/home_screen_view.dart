@@ -1,108 +1,104 @@
-// ignore_for_file: prefer_const_constructors, avoid_print
+// ignore_for_file: prefer_const_constructors, avoid_print, non_constant_identifier_names
 import 'package:flutter/material.dart';
-import 'package:pokedex/pokedex.dart';
+import 'package:flutterdex/controllers/pokemonlist_controller.dart';
+import 'package:flutterdex/models/pokemonlist_model.dart';
 
-final List<Map<String, dynamic>> pokemonList = [];
-
-// https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/35.png
-
-Future<void> getPokemon() async {
-  Pokedex().pokemonSpecies.getPage(offset: 251, limit: 134).then((response) {
-    final namedAPIResourceList = response;
-
-    final List<NamedAPIResource> results = namedAPIResourceList.results;
-
-    for (final namedAPIResource in results) {
-      final name = toSentenceCase(namedAPIResource.name);
-      final url = namedAPIResource.url;
-      int pokemonId = extractPokemonId(url);
-      String spriteurl =
-          'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$pokemonId.png';
-      print(spriteurl);
-      pokemonList.add({
-        'name': name,
-        'id': pokemonId,
-        'sprite':
-            'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/$pokemonId.png'
-      });
-    }
-  });
+String capitalize(String s) {
+  if (s.isEmpty) {
+    return s;
+  }
+  return s[0].toUpperCase() + s.substring(1);
 }
 
-Future<void> getSpritebyId(int id) async {
-  Pokedex().pokemon.get(id: id).then((response) {
-    final namedAPIResource = response;
-
-    final String? sprites = namedAPIResource.sprites.frontDefault;
-
-    print(sprites);
-  });
-}
-
-int extractPokemonId(String url) {
-  RegExp regex = RegExp(r'/pokemon-species/(\d+)/');
-
-  Match? match = regex.firstMatch(url);
-
+int extractPokemonSpeciesId(String url) {
+  final regex = RegExp(r'/(\d+)/$');
+  final match = regex.firstMatch(url);
   if (match != null) {
-    String idString = match.group(1) ?? '';
-    return int.tryParse(idString) ?? -1;
+    return int.parse(match.group(1)!);
   } else {
-    return -1;
+    throw Exception('Invalid Pokemon species URL');
   }
-}
-
-String toSentenceCase(String input) {
-  if (input.isEmpty) {
-    return input;
-  }
-
-  return input[0].toUpperCase() + input.substring(1).toLowerCase();
 }
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  late Future<PokemonList> _pokemonList;
+
+  @override
+  void initState() {
+    super.initState();
+    _pokemonList = PokemonListController().fetchPokemonList();
+  }
+
+  @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pokemon List'),
+        title: Text('Flutterdex'),
       ),
-      body: FutureBuilder<void>(
-          future: getPokemon(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              return ListView.builder(
-                  itemCount: pokemonList.length,
-                  itemBuilder: (context, index) {
-                    final pokemon = pokemonList[index];
-                    return Card(
+      body: PokemonCard(),
+    );
+  }
+
+  FutureBuilder<PokemonList> PokemonCard() {
+    return FutureBuilder<PokemonList>(
+      future: _pokemonList,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          // Display the Pokemon list data
+          return ListView.builder(
+            itemCount: snapshot.data!.results?.length,
+            itemBuilder: (context, index) {
+              return Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(15))),
+                child: Row(
+                  children: [
+                    SizedBox(width: 30),
+                    Expanded(
                       child: Row(
                         children: [
-                          Expanded(
-                            child: ListTile(
-                              title: Text(pokemon['name']),
-                              subtitle: Text('ID: ${pokemon['id']}'),
-                            ),
+                          Text(
+                            '#${extractPokemonSpeciesId(snapshot.data!.results![index].url.toString()).toString()}',
+                            style: TextStyle(fontSize: 24),
                           ),
-                          Image.network(
-                            pokemon['sprite'],
-                            width: 50.0,
-                            height: 50.0,
-                          )
+                          SizedBox(width: 10),
+                          Text(
+                            capitalize(
+                                snapshot.data!.results![index].name.toString()),
+                            style: TextStyle(fontSize: 24),
+                          ),
                         ],
                       ),
-                    );
-                  });
-            }
-            return const SizedBox.shrink();
-          }),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(30.0),
+                      child: Image.network(
+                        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${extractPokemonSpeciesId(snapshot.data!.results![index].url.toString())}.png',
+                        height: 100,
+                        width: 100,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        } else if (snapshot.hasError) {
+          // Display an error message
+          return Text('${snapshot.error}');
+        }
+        // Display a loading spinner
+        return Center(child: CircularProgressIndicator());
+      },
     );
   }
 }

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutterdex/controllers/pokemonlist_controller.dart';
 import 'package:flutterdex/models/pokemonlist_model.dart';
+import 'package:flutterdex/views/pokemon_details_view.dart';
 
 String capitalize(String s) {
   if (s.isEmpty) {
@@ -56,38 +57,51 @@ class _HomeScreenState extends State<HomeScreen> {
           return ListView.builder(
             itemCount: snapshot.data!.results?.length,
             itemBuilder: (context, index) {
-              return Card(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(15))),
-                child: Row(
-                  children: [
-                    SizedBox(width: 30),
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Text(
-                            '#${extractPokemonSpeciesId(snapshot.data!.results![index].url.toString()).toString()}',
-                            style: TextStyle(fontSize: 24),
-                          ),
-                          SizedBox(width: 10),
-                          Text(
-                            capitalize(
-                                snapshot.data!.results![index].name.toString()),
-                            style: TextStyle(fontSize: 24),
-                          ),
-                        ],
-                      ),
+              return GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => PokemonDetailsView(
+                          pokemon:
+                              snapshot.data!.results![index].name.toString()),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(30.0),
-                      child: Image.network(
-                        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${extractPokemonSpeciesId(snapshot.data!.results![index].url.toString())}.png',
-                        height: 100,
-                        width: 100,
-                        fit: BoxFit.cover,
+                  );
+                },
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(15))),
+                  child: Row(
+                    children: [
+                      SizedBox(width: 30),
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Text(
+                              '#${extractPokemonSpeciesId(snapshot.data!.results![index].url.toString()).toString()}',
+                              style: TextStyle(
+                                  fontSize: 24, fontFamily: 'Pokemon-Emerald'),
+                            ),
+                            SizedBox(width: 10),
+                            Text(
+                              capitalize(snapshot.data!.results![index].name
+                                  .toString()),
+                              style: TextStyle(
+                                  fontSize: 24, fontFamily: 'Pokemon-Emerald'),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                      Padding(
+                        padding: const EdgeInsets.all(30.0),
+                        child: Image.network(
+                          'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${extractPokemonSpeciesId(snapshot.data!.results![index].url.toString())}.png',
+                          height: 100,
+                          width: 100,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },

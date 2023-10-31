@@ -274,51 +274,51 @@ class PokemonController {
 //   }
 // }
 
-void main() async {
-  final PokemonController pokemonController = PokemonController();
+// void main() async {
+//   final PokemonController pokemonController = PokemonController();
 
-  try {
-    const String pokemonName = 'mudkip';
+//   try {
+//     const String pokemonName = 'mudkip';
 
-    // Fetch Pokemon Details
-    final Map<String, dynamic> pokemonDetails = {
-      'pokemonId': await pokemonController.fetchPokemonId(pokemonName),
-      'pokemonName': await pokemonController.fetchPokemonName(pokemonName),
-      'pokemonAbility':
-          await pokemonController.fetchPokemonAbility(pokemonName),
-      'pokemonHeightWeight':
-          await pokemonController.fetchPokemonHeightWeight(pokemonName),
-      'pokemonSprites':
-          await pokemonController.fetchPokemonSprites(pokemonName),
-      'pokemonStats': await pokemonController.fetchPokemonStats(pokemonName),
-      'pokemonTypes': await pokemonController.fetchPokemonTypes(pokemonName),
-    };
+//     // Fetch Pokemon Details
+//     final Map<String, dynamic> pokemonDetails = {
+//       'pokemonId': await pokemonController.fetchPokemonId(pokemonName),
+//       'pokemonName': await pokemonController.fetchPokemonName(pokemonName),
+//       'pokemonAbility':
+//           await pokemonController.fetchPokemonAbility(pokemonName),
+//       'pokemonHeightWeight':
+//           await pokemonController.fetchPokemonHeightWeight(pokemonName),
+//       'pokemonSprites':
+//           await pokemonController.fetchPokemonSprites(pokemonName),
+//       'pokemonStats': await pokemonController.fetchPokemonStats(pokemonName),
+//       'pokemonTypes': await pokemonController.fetchPokemonTypes(pokemonName),
+//     };
 
-    debugPrint('\nPokemon Details:');
-    debugPrint('Pokemon ID: ${pokemonDetails['pokemonId']['pokemonId']}');
-    debugPrint('Pokemon Name: ${pokemonDetails['pokemonName']['pokemonName']}');
-    debugPrint(
-        'Pokemon Ability: ${pokemonDetails['pokemonAbility']['pokemonAbility']}');
-    debugPrint(
-        'Pokemon Height: ${pokemonDetails['pokemonHeightWeight']['pokemonHeight']}');
-    debugPrint(
-        'Pokemon Weight: ${pokemonDetails['pokemonHeightWeight']['pokemonWeight']}');
-    debugPrint(
-        'Pokemon Base Experience: ${pokemonDetails['pokemonStats']['pokemonBaseExperience']}');
-    debugPrint('Pokemon HP: ${pokemonDetails['pokemonStats']['hp']}');
-    debugPrint('Pokemon Attack: ${pokemonDetails['pokemonStats']['attack']}');
-    debugPrint('Pokemon Defense: ${pokemonDetails['pokemonStats']['defense']}');
-    debugPrint(
-        'Pokemon Special Attack: ${pokemonDetails['pokemonStats']['specialAttack']}');
-    debugPrint(
-        'Pokemon Special Defense: ${pokemonDetails['pokemonStats']['specialDefense']}');
-    debugPrint(
-        'Pokemon Type 1: ${pokemonDetails['pokemonTypes']['pokemonType1']}');
-    debugPrint(
-        'Pokemon Type 2: ${pokemonDetails['pokemonTypes']['pokemonType2']}');
-    debugPrint('Type 1 Color: ${pokemonDetails['pokemonTypes']['typeColor1']}');
-    debugPrint('Type 2 Color: ${pokemonDetails['pokemonTypes']['typeColor2']}');
-  } catch (error) {
-    debugPrint('Error fetching data: $error');
-  }
-}
+//     debugPrint('\nPokemon Details:');
+//     debugPrint('Pokemon ID: ${pokemonDetails['pokemonId']['pokemonId']}');
+//     debugPrint('Pokemon Name: ${pokemonDetails['pokemonName']['pokemonName']}');
+//     debugPrint(
+//         'Pokemon Ability: ${pokemonDetails['pokemonAbility']['pokemonAbility']}');
+//     debugPrint(
+//         'Pokemon Height: ${pokemonDetails['pokemonHeightWeight']['pokemonHeight']}');
+//     debugPrint(
+//         'Pokemon Weight: ${pokemonDetails['pokemonHeightWeight']['pokemonWeight']}');
+//     debugPrint(
+//         'Pokemon Base Experience: ${pokemonDetails['pokemonStats']['pokemonBaseExperience']}');
+//     debugPrint('Pokemon HP: ${pokemonDetails['pokemonStats']['hp']}');
+//     debugPrint('Pokemon Attack: ${pokemonDetails['pokemonStats']['attack']}');
+//     debugPrint('Pokemon Defense: ${pokemonDetails['pokemonStats']['defense']}');
+//     debugPrint(
+//         'Pokemon Special Attack: ${pokemonDetails['pokemonStats']['specialAttack']}');
+//     debugPrint(
+//         'Pokemon Special Defense: ${pokemonDetails['pokemonStats']['specialDefense']}');
+//     debugPrint(
+//         'Pokemon Type 1: ${pokemonDetails['pokemonTypes']['pokemonType1']}');
+//     debugPrint(
+//         'Pokemon Type 2: ${pokemonDetails['pokemonTypes']['pokemonType2']}');
+//     debugPrint('Type 1 Color: ${pokemonDetails['pokemonTypes']['typeColor1']}');
+//     debugPrint('Type 2 Color: ${pokemonDetails['pokemonTypes']['typeColor2']}');
+//   } catch (error) {
+//     debugPrint('Error fetching data: $error');
+//   }
+// }

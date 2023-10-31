@@ -18,7 +18,7 @@ String decimetersToMeters(int decimeters) {
   return meters.toStringAsFixed(2);
 }
 
-String hectogramsToKilograms(double hectograms) {
+String hectogramsToKilograms(int hectograms) {
   double kilograms = hectograms * 0.1;
   return kilograms.toStringAsFixed(2);
 }
@@ -97,122 +97,228 @@ class TypeColorMapper {
 }
 
 class PokemonController {
-  Future<Map<String, dynamic>> fetchPokemonData(String name) async {
-    if (name == 'deoxys') {
-      final pokemon = await Pokedex().pokemon.get(name: name);
+  Future<Map<String, dynamic>> fetchPokemonId(String name) async {
+    final pokemon = await Pokedex().pokemon.get(name: name);
+    final int pokemonId = pokemon.id;
+    return {
+      'pokemonId': pokemonId,
+    };
+  }
 
-      const int pokemonId = 386;
-      const String pokemonName = 'Deoxys';
-      final pokemonAbility = pokemon.abilities[0].ability.name;
-      final pokemonBaseExperience = pokemon.baseExperience;
-      final pokemonHeight = pokemon.height;
-      final pokemonWeight = pokemon.weight;
-      const pokemonSpriteFrontDefault =
-          'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$pokemonId.png';
-      const pokemonSpriteBackDefault =
-          'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/$pokemonId.png';
-      const pokemonSpriteOffcialArtwork =
-          'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/$pokemonId.png';
+  Future<Map<String, dynamic>> fetchPokemonName(String name) async {
+    final pokemon = await Pokedex().pokemon.get(name: name);
+    final String pokemonName = pokemon.name;
+    return {
+      'pokemonName': capitalize(pokemonName),
+    };
+  }
 
-      // Get the first type
-      final pokemonType1 = pokemon.types[0].type.name;
-      final Color typeColor1 = TypeColorMapper.getTypeColor(pokemonType1);
-      debugPrint('Pokemon Type 1: $pokemonType1, Hex Code: $typeColor1');
+  Future<Map<String, dynamic>> fetchPokemonAbility(String name) async {
+    final pokemon = await Pokedex().pokemon.get(name: name);
 
-      // Check if the Pokemon has a second type
-      if (pokemon.types.length > 1) {
-        final pokemonType2 = pokemon.types[1].type.name;
-        final Color typeColor2 = TypeColorMapper.getTypeColor(pokemonType2);
-        debugPrint('Pokemon Type 2: $pokemonType2, Hex Code: $typeColor2');
-      }
+    final pokemonAbility = pokemon.abilities[0].ability.name;
+    final ability = await Pokedex().abilities.get(name: pokemonAbility);
+    final dynamic abilityEffectEntries = ability.effectEntries[0].effect;
 
-      return {
-        'pokemonId': pokemonId,
-        'pokemonName': pokemonName,
-        'pokemonAbility': pokemonAbility,
-        'pokemonBaseExperience': pokemonBaseExperience,
-        'pokemonHeight': pokemonHeight,
-        'pokemonWeight': pokemonWeight,
-        'pokemonSpriteFrontDefault': pokemonSpriteFrontDefault,
-        'pokemonSpriteBackDefault': pokemonSpriteBackDefault,
-        'pokemonSpriteOffcialArtwork': pokemonSpriteOffcialArtwork,
-        // Add more data as needed...
-      };
-    } else {
-      final pokemon = await Pokedex().pokemon.get(name: name);
+    final dynamic abilityFlavorTextEntries =
+        ability.flavorTextEntries[1].flavorText;
+    return {
+      'pokemonAbility': capitalize(pokemonAbility),
+      'pokemonAbilityEffectEntries': abilityEffectEntries,
+      'pokemonAbilityFlavorTextEntries': abilityFlavorTextEntries,
+    };
+  }
 
-      final int pokemonId = pokemon.id;
-      final String pokemonName = pokemon.name;
-      final pokemonAbility = pokemon.abilities[0].ability.name;
-      final pokemonBaseExperience = pokemon.baseExperience;
-      final pokemonHeight = pokemon.height;
-      final pokemonWeight = pokemon.weight;
-      final pokemonSpriteFrontDefault =
-          'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$pokemonId.png';
-      final pokemonSpriteBackDefault =
-          'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/$pokemonId.png';
-      final pokemonSpriteOffcialArtwork =
-          'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/$pokemonId.png';
+  Future<Map<String, dynamic>> fetchPokemonHeightWeight(String name) async {
+    final pokemon = await Pokedex().pokemon.get(name: name);
 
-      // Get the first type
-      final pokemonType1 = pokemon.types[0].type.name;
-      final Color typeColor1 = TypeColorMapper.getTypeColor(pokemonType1);
-      debugPrint('Pokemon Type 1: $pokemonType1, Hex Code: $typeColor1');
+    final pokemonHeight = pokemon.height;
+    final pokemonWeight = pokemon.weight;
 
-      // Check if the Pokemon has a second type
-      if (pokemon.types.length > 1) {
-        final pokemonType2 = pokemon.types[1].type.name;
-        final Color typeColor2 = TypeColorMapper.getTypeColor(pokemonType2);
-        debugPrint('Pokemon Type 2: $pokemonType2, Hex Code: $typeColor2');
-      }
+    return {
+      'pokemonHeight': pokemonHeight,
+      'pokemonWeight': pokemonWeight,
+    };
+  }
 
-      return {
-        'pokemonId': pokemonId,
-        'pokemonName': pokemonName,
-        'pokemonAbility': pokemonAbility,
-        'pokemonBaseExperience': pokemonBaseExperience,
-        'pokemonHeight': pokemonHeight,
-        'pokemonWeight': pokemonWeight,
-        'pokemonSpriteFrontDefault': pokemonSpriteFrontDefault,
-        'pokemonSpriteBackDefault': pokemonSpriteBackDefault,
-        'pokemonSpriteOffcialArtwork': pokemonSpriteOffcialArtwork,
-        // Add more data as needed...
-      };
+  Future<Map<String, dynamic>> fetchPokemonSprites(String name) async {
+    final pokemon = await Pokedex().pokemon.get(name: name);
+
+    final int pokemonId = pokemon.id;
+
+    final pokemonSpriteFrontDefault =
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$pokemonId.png';
+    final pokemonSpriteBackDefault =
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/$pokemonId.png';
+    final pokemonSpriteOffcialArtwork =
+        'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/$pokemonId.png';
+
+    return {
+      'pokemonSpriteFrontDefault': pokemonSpriteFrontDefault,
+      'pokemonSpriteBackDefault': pokemonSpriteBackDefault,
+      'pokemonSpriteOffcialArtwork': pokemonSpriteOffcialArtwork,
+    };
+  }
+
+  Future<Map<String, dynamic>> fetchPokemonStats(String name) async {
+    final pokemon = await Pokedex().pokemon.get(name: name);
+
+    final pokemonBaseExperience = pokemon.baseExperience;
+    final hp = pokemon.stats[0].baseStat;
+    final attack = pokemon.stats[1].baseStat;
+    final defense = pokemon.stats[2].baseStat;
+    final specialAttack = pokemon.stats[3].baseStat;
+    final specialDefense = pokemon.stats[4].baseStat;
+
+    return {
+      'pokemonBaseExperience': pokemonBaseExperience,
+      'hp': hp,
+      'attack': attack,
+      'defense': defense,
+      'specialAttack': specialAttack,
+      'specialDefense': specialDefense,
+    };
+  }
+
+  Future<Map<String, dynamic>> fetchPokemonTypes(String name) async {
+    final pokemon = await Pokedex().pokemon.get(name: name);
+
+    // Get the first type
+    final pokemonType1 = pokemon.types[0].type.name;
+    final Color typeColor1 = TypeColorMapper.getTypeColor(pokemonType1);
+    debugPrint('Pokemon Type 1: $pokemonType1, Hex Code: $typeColor1');
+
+    var pokemonType2 = 'No Second type';
+    Color typeColor2 = const Color(0xFF808080); // Default color
+
+    // Check if the Pokemon has a second type
+    if (pokemon.types.length > 1) {
+      pokemonType2 = pokemon.types[1].type.name;
+      typeColor2 = TypeColorMapper.getTypeColor(pokemonType2);
+      debugPrint('Pokemon Type 2: $pokemonType2, Hex Code: $typeColor2');
     }
+
+    return {
+      'pokemonType1': pokemonType1,
+      'typeColor1': typeColor1,
+      'pokemonType2': pokemonType2,
+      'typeColor2': typeColor2,
+    };
   }
 }
+//   Future<Map<String, dynamic>> fetchPokemonData(String name) async {
+//     final pokemon = await Pokedex().pokemon.get(name: name);
+
+//     final int pokemonId = pokemon.id;
+//     final String pokemonName = pokemon.name;
+//     final pokemonAbility = pokemon.abilities[0].ability.name;
+//     final ability = await Pokedex().abilities.get(name: pokemonAbility);
+
+//     final pokemonBaseExperience = pokemon.baseExperience;
+//     final pokemonHeight = pokemon.height;
+//     final pokemonWeight = pokemon.weight;
+//     final pokemonSpriteFrontDefault =
+//         'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$pokemonId.png';
+//     final pokemonSpriteBackDefault =
+//         'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/$pokemonId.png';
+//     final pokemonSpriteOffcialArtwork =
+//         'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/$pokemonId.png';
+
+//     final dynamic abilityEffectEntries = ability.effectEntries[0].effect;
+//     final dynamic abilityFlavorTextEntries =
+//         ability.flavorTextEntries[1].flavorText;
+
+//     // Get the first type
+//     final pokemonType1 = pokemon.types[0].type.name;
+//     final Color typeColor1 = TypeColorMapper.getTypeColor(pokemonType1);
+//     debugPrint('Pokemon Type 1: $pokemonType1, Hex Code: $typeColor1');
+
+//     var pokemonType2 = 'No Second type';
+//     Color typeColor2 = const Color(0xFF808080); // Default color
+
+//     // Check if the Pokemon has a second type
+//     if (pokemon.types.length > 1) {
+//       pokemonType2 = pokemon.types[1].type.name;
+//       typeColor2 = TypeColorMapper.getTypeColor(pokemonType2);
+//       debugPrint('Pokemon Type 2: $pokemonType2, Hex Code: $typeColor2');
+//     }
+
+//     final hp = pokemon.stats[0].baseStat;
+//     final attack = pokemon.stats[1].baseStat;
+//     final defense = pokemon.stats[2].baseStat;
+//     final specialAttack = pokemon.stats[3].baseStat;
+//     final specialDefense = pokemon.stats[4].baseStat;
+
+//     return {
+//       'pokemonId': pokemonId,
+//       'pokemonName': capitalize(pokemonName),
+//       'pokemonAbility': capitalize(pokemonAbility),
+//       'pokemonAbilityEffectEntries': abilityEffectEntries,
+//       'pokemonAbilityFlavorTextEntries': abilityFlavorTextEntries,
+//       'pokemonBaseExperience': pokemonBaseExperience,
+//       'pokemonHeight': pokemonHeight,
+//       'pokemonWeight': pokemonWeight,
+//       'pokemonSpriteFrontDefault': pokemonSpriteFrontDefault,
+//       'pokemonSpriteBackDefault': pokemonSpriteBackDefault,
+//       'pokemonSpriteOffcialArtwork': pokemonSpriteOffcialArtwork,
+//       'pokemonType1': pokemonType1,
+//       'typeColor1': typeColor1,
+//       'pokemonType2': pokemonType2,
+//       'typeColor2': typeColor2,
+//       'hp': hp,
+//       'attack': attack,
+//       'defense': defense,
+//       'specialAttack': specialAttack,
+//       'specialDefense': specialDefense,
+//     };
+//   }
+// }
 
 void main() async {
+  final PokemonController pokemonController = PokemonController();
+
   try {
-    final PokemonController pokemonController = PokemonController();
-    final Map<String, dynamic> pokemonData =
-        await pokemonController.fetchPokemonData('deoxys-normal');
+    const String pokemonName = 'mudkip';
 
-    // Print the information
-    debugPrint('Pokemon ID: ${pokemonData['pokemonId']}');
-    debugPrint('Pokemon Name: ${pokemonData['pokemonName']}');
-    debugPrint('Pokemon Ability: ${pokemonData['pokemonAbility']}');
-    debugPrint(
-        'Pokemon Base Experience: ${pokemonData['pokemonBaseExperience']}');
-    debugPrint('Pokemon Height: ${pokemonData['pokemonHeight']}');
-    debugPrint('Pokemon Weight: ${pokemonData['pokemonWeight']}');
-    // Add more prints as needed...
+    // Fetch Pokemon Details
+    final Map<String, dynamic> pokemonDetails = {
+      'pokemonId': await pokemonController.fetchPokemonId(pokemonName),
+      'pokemonName': await pokemonController.fetchPokemonName(pokemonName),
+      'pokemonAbility':
+          await pokemonController.fetchPokemonAbility(pokemonName),
+      'pokemonHeightWeight':
+          await pokemonController.fetchPokemonHeightWeight(pokemonName),
+      'pokemonSprites':
+          await pokemonController.fetchPokemonSprites(pokemonName),
+      'pokemonStats': await pokemonController.fetchPokemonStats(pokemonName),
+      'pokemonTypes': await pokemonController.fetchPokemonTypes(pokemonName),
+    };
 
-    // For types
-    if (pokemonData.containsKey('pokemonType1')) {
-      debugPrint('Pokemon Type 1: ${pokemonData['pokemonType1']}');
-      debugPrint('Type Color 1: ${pokemonData['typeColor1']}');
-    }
-
-    if (pokemonData.containsKey('pokemonType2')) {
-      debugPrint('Pokemon Type 2: ${pokemonData['pokemonType2']}');
-      debugPrint('Type Color 2: ${pokemonData['typeColor2']}');
-    }
+    debugPrint('\nPokemon Details:');
+    debugPrint('Pokemon ID: ${pokemonDetails['pokemonId']['pokemonId']}');
+    debugPrint('Pokemon Name: ${pokemonDetails['pokemonName']['pokemonName']}');
     debugPrint(
-        'Sprite (Front Default): ${pokemonData['pokemonSpriteFrontDefault']}');
+        'Pokemon Ability: ${pokemonDetails['pokemonAbility']['pokemonAbility']}');
     debugPrint(
-        'Sprite (Front Default): ${pokemonData['pokemonSpriteBackDefault']}');
+        'Pokemon Height: ${pokemonDetails['pokemonHeightWeight']['pokemonHeight']}');
+    debugPrint(
+        'Pokemon Weight: ${pokemonDetails['pokemonHeightWeight']['pokemonWeight']}');
+    debugPrint(
+        'Pokemon Base Experience: ${pokemonDetails['pokemonStats']['pokemonBaseExperience']}');
+    debugPrint('Pokemon HP: ${pokemonDetails['pokemonStats']['hp']}');
+    debugPrint('Pokemon Attack: ${pokemonDetails['pokemonStats']['attack']}');
+    debugPrint('Pokemon Defense: ${pokemonDetails['pokemonStats']['defense']}');
+    debugPrint(
+        'Pokemon Special Attack: ${pokemonDetails['pokemonStats']['specialAttack']}');
+    debugPrint(
+        'Pokemon Special Defense: ${pokemonDetails['pokemonStats']['specialDefense']}');
+    debugPrint(
+        'Pokemon Type 1: ${pokemonDetails['pokemonTypes']['pokemonType1']}');
+    debugPrint(
+        'Pokemon Type 2: ${pokemonDetails['pokemonTypes']['pokemonType2']}');
+    debugPrint('Type 1 Color: ${pokemonDetails['pokemonTypes']['typeColor1']}');
+    debugPrint('Type 2 Color: ${pokemonDetails['pokemonTypes']['typeColor2']}');
   } catch (error) {
-    debugPrint('Error fetching Pokemon data: $error');
+    debugPrint('Error fetching data: $error');
   }
 }

@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutterdex/views/home_screen_view.dart';
 import 'package:flutterdex/views/pokemon_details_view.dart';
 
-// import 'views/home_screen.dart';
-
 void main() => runApp(const Main());
 
 class Main extends StatelessWidget {

@@ -5,10 +5,10 @@ import 'dart:convert';
 
 // offset=251&limit=135
 class PokemonListController {
-  final String apiUrl =
-      'https://pokeapi.co/api/v2/pokemon-species/?offset=251&limit=135';
-
-  Future<PokemonList> fetchPokemonList() async {
+  // 'https://pokeapi.co/api/v2/pokemon-species/?offset=251&limit=135'
+  Future<PokemonList> fetchPokemonList(int offset, int limit) async {
+    final String apiUrl =
+        'https://pokeapi.co/api/v2/pokemon-species/?offset=$offset&limit=$limit';
     final response = await http.get(Uri.parse(apiUrl));
 
     if (response.statusCode == 200) {

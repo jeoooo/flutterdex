@@ -181,29 +181,55 @@ class PokemonController {
   }
 
   Future<Map<String, dynamic>> fetchPokemonTypes(String name) async {
-    final pokemon = await Pokedex().pokemon.get(name: name);
+    if (name == 'deoxys') {
+      final pokemon = await Pokedex().pokemon.get(name: 'deoxys-normal');
 
-    // Get the first type
-    final pokemonType1 = pokemon.types[0].type.name;
-    final Color typeColor1 = TypeColorMapper.getTypeColor(pokemonType1);
-    debugPrint('Pokemon Type 1: $pokemonType1, Hex Code: $typeColor1');
+      // Get the first type
+      final pokemonType1 = pokemon.types[0].type.name;
+      final Color typeColor1 = TypeColorMapper.getTypeColor(pokemonType1);
+      // debugPrint('Pokemon Type 1: $pokemonType1, Hex Code: $typeColor1');
 
-    var pokemonType2 = 'No Second type';
-    Color typeColor2 = const Color(0xFF808080); // Default color
+      var pokemonType2 = 'No Second type';
+      Color typeColor2 = const Color(0xFF808080); // Default color
 
-    // Check if the Pokemon has a second type
-    if (pokemon.types.length > 1) {
-      pokemonType2 = pokemon.types[1].type.name;
-      typeColor2 = TypeColorMapper.getTypeColor(pokemonType2);
-      debugPrint('Pokemon Type 2: $pokemonType2, Hex Code: $typeColor2');
+      // Check if the Pokemon has a second type
+      if (pokemon.types.length > 1) {
+        pokemonType2 = pokemon.types[1].type.name;
+        typeColor2 = TypeColorMapper.getTypeColor(pokemonType2);
+        // debugPrint('Pokemon Type 2: $pokemonType2, Hex Code: $typeColor2');
+      }
+
+      return {
+        'pokemonType1': pokemonType1,
+        'typeColor1': typeColor1,
+        'pokemonType2': pokemonType2,
+        'typeColor2': typeColor2,
+      };
+    } else {
+      final pokemon = await Pokedex().pokemon.get(name: name);
+
+      // Get the first type
+      final pokemonType1 = pokemon.types[0].type.name;
+      final Color typeColor1 = TypeColorMapper.getTypeColor(pokemonType1);
+      // debugPrint('Pokemon Type 1: $pokemonType1, Hex Code: $typeColor1');
+
+      var pokemonType2 = 'No Second type';
+      Color typeColor2 = const Color(0xFF808080); // Default color
+
+      // Check if the Pokemon has a second type
+      if (pokemon.types.length > 1) {
+        pokemonType2 = pokemon.types[1].type.name;
+        typeColor2 = TypeColorMapper.getTypeColor(pokemonType2);
+        // debugPrint('Pokemon Type 2: $pokemonType2, Hex Code: $typeColor2');
+      }
+
+      return {
+        'pokemonType1': pokemonType1,
+        'typeColor1': typeColor1,
+        'pokemonType2': pokemonType2,
+        'typeColor2': typeColor2,
+      };
     }
-
-    return {
-      'pokemonType1': pokemonType1,
-      'typeColor1': typeColor1,
-      'pokemonType2': pokemonType2,
-      'typeColor2': typeColor2,
-    };
   }
 }
 //   Future<Map<String, dynamic>> fetchPokemonData(String name) async {

@@ -1,11 +1,8 @@
 // ignore_for_file: avoid_print, prefer_const_constructors, non_constant_identifier_names
 
 import 'package:flutter/material.dart';
+// ignore: unused_import
 import 'package:pokedex/pokedex.dart';
-
-import 'package:percent_indicator/percent_indicator.dart';
-
-import 'pokemon_moves_screen.dart';
 
 // ! REFACTOR FUNCTIONS
 
@@ -68,8 +65,16 @@ String getGenderRatioString(double genderRate) {
 }
 
 class PokemonDetailsView extends StatefulWidget {
-  final String pokemon;
-  const PokemonDetailsView({Key? key, required this.pokemon}) : super(key: key);
+  const PokemonDetailsView({
+    Key? key,
+    required pokemonId,
+    required pokemonName,
+    required type1,
+    required typeColor1,
+    required type2,
+    required typeColor2,
+    required String pokemon,
+  }) : super(key: key);
 
   @override
   State<PokemonDetailsView> createState() => _PokemonDetailsViewState();
@@ -79,12 +84,43 @@ class _PokemonDetailsViewState extends State<PokemonDetailsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Colors.red,
         appBar: AppBar(
+          shadowColor: Color.fromARGB(0, 255, 255, 255),
+          backgroundColor: Colors.red,
           automaticallyImplyLeading: false,
-          title: const Text('Flutterdex'),
         ),
         body: SingleChildScrollView(
-          child: Center(),
+          child: SizedBox(
+              height: 250,
+              width: MediaQuery.of(context).size.width * 1,
+              child: PokemonSpriteContainer()),
+        ));
+  }
+}
+
+class PokemonSpriteContainer extends StatelessWidget {
+  const PokemonSpriteContainer({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(80), topRight: Radius.circular(80))),
+        color: Colors.white,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 200, // Set the width as needed
+              height: 200, // Set the height as needed
+              child: Image.network(
+                  'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/252.png'),
+            )
+          ],
         ));
   }
 }

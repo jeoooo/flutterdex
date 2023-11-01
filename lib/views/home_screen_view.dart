@@ -1,20 +1,19 @@
 // ignore_for_file: prefer_const_constructors, avoid_print, non_constant_identifier_names
 import 'package:flutter/material.dart';
+import 'package:flutterdex/controllers/pokemon_controller.dart';
 import 'package:flutterdex/controllers/pokemonlist_controller.dart';
 import 'package:flutterdex/models/pokemonlist_model.dart';
+import 'package:flutterdex/utils/string_extension.dart';
 import 'package:flutterdex/views/pokemon_details_view.dart';
 
-String capitalize(String s) {
-  if (s.isEmpty) {
-    return s;
-  }
-  return s[0].toUpperCase() + s.substring(1);
-}
+import 'widgets/loading.dart';
+import 'widgets/pokemon_card.dart';
 
 int extractPokemonSpeciesId(String url) {
   final regex = RegExp(r'/(\d+)/$');
   final match = regex.firstMatch(url);
-  if (match != null) {
+
+  if (match != null && match.groupCount >= 1) {
     return int.parse(match.group(1)!);
   } else {
     throw Exception('Invalid Pokemon species URL');
@@ -30,89 +29,109 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<PokemonList> _pokemonList;
+  final Map<String, dynamic> _pokemonTypeCache = {};
 
   @override
   void initState() {
     super.initState();
-    _pokemonList = PokemonListController().fetchPokemonList();
+    // 'https://pokeapi.co/api/v2/pokemon-species/?offset=251&limit=135'
+    // testing deoxys
+    // 'https://pokeapi.co/api/v2/pokemon-species/?offset=380&limit=6'
+    _pokemonList = PokemonListController().fetchPokemonList(251, 135);
   }
 
-  @override
+  // ignore: unused_element
+  Future<dynamic> _getPokemonTypes(String pokemonName) async {
+    // Check the cache first
+    if (_pokemonTypeCache.containsKey(pokemonName)) {
+      return _pokemonTypeCache[pokemonName];
+    }
+
+    // If not in the cache, fetch from the API
+    dynamic pokemonTypes =
+        await PokemonController().fetchPokemonTypes(pokemonName);
+
+    // Store in the cache
+    _pokemonTypeCache[pokemonName] = pokemonTypes;
+
+    return pokemonTypes;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.red,
       appBar: AppBar(
+        shadowColor: Color(0x00ff8080),
+        backgroundColor: Colors.red,
         title: Text('Flutterdex'),
       ),
-      body: PokemonCard(),
-    );
-  }
-
-  FutureBuilder<PokemonList> PokemonCard() {
-    return FutureBuilder<PokemonList>(
-      future: _pokemonList,
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          // Display the Pokemon list data
-          return ListView.builder(
-            itemCount: snapshot.data!.results?.length,
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => PokemonDetailsView(
-                          pokemon:
-                              snapshot.data!.results![index].name.toString()),
-                    ),
-                  );
-                },
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(15))),
-                  child: Row(
-                    children: [
-                      SizedBox(width: 30),
-                      Expanded(
-                        child: Row(
-                          children: [
-                            Text(
-                              '#${extractPokemonSpeciesId(snapshot.data!.results![index].url.toString()).toString()}',
-                              style: TextStyle(
-                                  fontSize: 24, fontFamily: 'Pokemon-Emerald'),
-                            ),
-                            SizedBox(width: 10),
-                            Text(
-                              capitalize(snapshot.data!.results![index].name
-                                  .toString()),
-                              style: TextStyle(
-                                  fontSize: 24, fontFamily: 'Pokemon-Emerald'),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(30.0),
-                        child: Image.network(
-                          'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${extractPokemonSpeciesId(snapshot.data!.results![index].url.toString())}.png',
-                          height: 100,
-                          width: 100,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ],
+      body: FutureBuilder(
+        future: _pokemonList,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return ListView.builder(
+              itemCount: snapshot.data!.results?.length,
+              itemBuilder: (context, index) {
+                return FutureBuilder(
+                  future: PokemonController().fetchPokemonTypes(
+                    snapshot.data!.results![index].name.toString(),
                   ),
-                ),
-              );
-            },
-          );
-        } else if (snapshot.hasError) {
-          // Display an error message
-          return Text('${snapshot.error}');
-        }
-        // Display a loading spinner
-        return Center(child: CircularProgressIndicator());
-      },
+                  builder: (context, pokemonTypesSnapshot) {
+                    if (pokemonTypesSnapshot.hasData) {
+                      dynamic pokemontypes = pokemonTypesSnapshot.data;
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => PokemonDetailsView(
+                                pokemonId: extractPokemonSpeciesId(
+                                  snapshot.data!.results![index].url.toString(),
+                                ),
+                                pokemonName: snapshot.data!.results![index].name
+                                    .toString()
+                                    .capitalize(),
+                                type1: pokemontypes['pokemonType1'],
+                                typeColor1: pokemontypes['typeColor1'],
+                                type2: pokemontypes['pokemonType2'],
+                                typeColor2: pokemontypes['typeColor2'],
+                                pokemon: '',
+                              ),
+                            ),
+                          );
+                        },
+                        child: PokemonCard(
+                          type1: pokemontypes['pokemonType1'],
+                          typeColor1: pokemontypes['typeColor1'],
+                          // Fix: Use 'type2' and 'typeColor2' instead of 'typeColor1'
+                          type2: pokemontypes['pokemonType2'],
+                          typeColor2: pokemontypes['typeColor2'],
+                          pokemonId: extractPokemonSpeciesId(
+                            snapshot.data!.results![index].url.toString(),
+                          ),
+                          pokemonName: snapshot.data!.results![index].name
+                              .toString()
+                              .capitalize(),
+                        ),
+                      );
+                    } else if (pokemonTypesSnapshot.hasError) {
+                      return Center(
+                        child: Text('${pokemonTypesSnapshot.error}'),
+                      );
+                    }
+                    return Loading();
+                  },
+                );
+              },
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('${snapshot.error}'),
+            );
+          }
+          return Loading();
+        },
+      ),
     );
   }
 }
